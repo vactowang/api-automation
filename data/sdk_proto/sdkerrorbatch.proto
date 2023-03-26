@@ -1,0 +1,225 @@
+syntax = "proto3";
+option csharp_namespace = "VungleAdsProtobuf";
+option java_package = "com.vungle.ads.internal.protos";
+
+// This is the batch of the errors to send to the server
+message SDKErrorBatch {
+    repeated SDKError errors = 1;
+}
+
+message SDKError {
+    // The Unix timestamp (in milliseconds) of the time of error.
+    int64 at = 1;
+    // The error code
+    Reason reason = 2;
+    // This will be the stack trace of a crash or a handwritten log.
+    string message = 3;
+    // The event id of the ad, if relevant. There are places where it is unavailable.
+    string eventId = 4;
+
+    // (iOS) Device Information
+
+    string make = 5;
+    string model = 6;
+    string os = 7;
+    string osVersion = 8;
+    string connectionType = 9;
+    string connectionTypeDetail = 10;
+
+    // The placement id of the ad, if relevant. There are places where it is unavailable.
+    string placementReferenceId = 11;
+    // The creative id of the ad, if relevant. There are places where it is unavailable.
+    string creativeId = 12;
+
+    string connectionTypeDetailAndroid = 101; // Similar values connectionTypeDetail (iOS) but Android Specific Strings
+
+    // NOTE: These error code names are exposed to client apps via logs.
+    enum Reason {
+        UNKNOWN_ERROR = 0; // This shouldn't be used. If an error is being logged, the context is already known.
+
+        // initialization errors
+
+        INVALID_APP_ID = 2; // The app id fails SDK validation, like empty string
+        CURRENTLY_INITIALIZING = 3; // The SDK is already initializing when another call is made
+        ALREADY_INITIALIZED = 4; // The SDK is already successfully initialized when another call is made
+        reserved 5;
+        SDK_NOT_INITIALIZED = 6; // Returned if any public API is called before initialization, if it requires initialization
+        USER_AGENT_ERROR = 7; // The error in retrieving webView user agent
+
+        // network errors
+
+        API_REQUEST_ERROR = 101; // Server error getting a response from an api call. Message contains the URL
+        API_RESPONSE_DATA_ERROR = 102; // Server didn't send any data in the api call. Message contains the URL
+        API_RESPONSE_DECODE_ERROR = 103; // SDK failed to decode the response into the expected object. Message contains the URL
+        API_FAILED_STATUS_CODE = 104; // The status code from an API call (like config, ads, etc) returned something not 2xx. Message contains the URL
+        INVALID_TEMPLATE_URL = 105; // The template url is nil, empty or invalid url. Message contains the URL
+        INVALID_REQUEST_BUILDER_ERROR = 106; // Failed to create a URL object to the targeted endpoint. Message contains the URL
+        reserved 107;
+        reserved 108;
+        TEMPLATE_UNZIP_ERROR = 109; // Failed to unarchive the template file
+        INVALID_CTA_URL = 110; // The CTA URL is an invalid url or it failed to open. Message contains the URL
+        INVALID_ASSET_URL = 111; // The URL from the cacheable replacements is invalid. Message contains the URL
+        ASSET_REQUEST_ERROR = 112; // The asset failed to download or Apple didn't return to us the temporary location. Message contains the URL
+        ASSET_RESPONSE_DATA_ERROR = 113; // Apple returned an unexpected response object or failed to load the downloaded data.
+        ASSET_WRITE_ERROR = 114; // Failed to save the downloaded asset to disk.
+        INVALID_INDEX_URL = 115; // The index.html doesn't exist or there's an issue with the event id to lookup the html file
+        GZIP_ENCODE_ERROR = 116; // Failed to gzip the token data for the bidding token
+        ASSET_FAILED_STATUS_CODE = 117; // The status code from the asset download didn't return 200. Message contains the URL
+        PROTOBUF_SERIALIZATION_ERROR = 118; // Failed to serialize the protobuf object for the request body
+        JSON_ENCODE_ERROR = 119; // Failed to encode the json object for the bidding token or into the request body.
+        reserved 120;
+        TPAT_ERROR = 121; // Failed to create the TPAT URL object or send it. Message contains the URL
+        INVALID_ADS_ENDPOINT = 122; // The ads endpoint doesn't exist in the config response body
+        INVALID_RI_ENDPOINT = 123; // The ri endpoint doesn't exist in the config response body
+        INVALID_LOG_ERROR_ENDPOINT = 124; // The error_logs endpoint doesn't exist in the config response body
+        INVALID_METRICS_ENDPOINT = 125; // The metrics endpoint doesn't exist in the config response body
+        ASSET_FAILED_INSUFFICIENT_SPACE = 126;
+        ASSET_FAILED_MAX_SPACE_EXCEEDED = 127;
+        INVALID_TPAT_KEY = 128;
+        EMPTY_TPAT_ERROR = 129;
+	MRAID_DOWNLOAD_JS_ERROR = 130; // MRAID JS file download failed
+	MRAID_JS_WRITE_FAILED = 131; // Failed to save MRAID JS files to disk
+	OMSDK_DOWNLOAD_JS_ERROR = 132; // OMSDK JS file download failed
+	OMSDK_JS_WRITE_FAILED = 133; // Failed to save OMSDK JS files to disk
+
+        // ad load errors
+
+        INVALID_EVENT_ID_ERROR = 200; // The event id in the ads response is invalid or the local URL can't be created from it
+        INVALID_PLACEMENT_ID = 201; // The placement id in the ad object is empty or not part of the config response
+        AD_CONSUMED = 202; // Pub attempted to load when the ad is already marked as completed
+        AD_IS_LOADING = 203; // Pub called load to a currently loading ad object
+        AD_ALREADY_LOADED = 204; // Pub called load when the ad object already loaded successfully
+        AD_IS_PLAYING = 205; // Pub called load, play or canPlay to an already playing ad object
+        AD_ALREADY_FAILED = 206; // Pub called load on a failed ad object
+
+        INVALID_BID_PAYLOAD = 208; // The bid payload doesn't contain a valid ads response
+        INVALID_JSON_BID_PAYLOAD = 209; // The bid payload was unable decode the payload into the json objects
+        AD_NOT_LOADED = 210; // The pub didnt' call the load API before the play or it didn't finish loading.
+        reserved 211;
+        PLACEMENT_SLEEP = 212; // The platform returned a sleeping response
+        INVALID_ADUNIT_BID_PAYLOAD = 213; // Failed to decode the ad unit from the bid payload
+        INVALID_GZIP_BID_PAYLOAD = 214; // Failed to ungzip the ad from the bid payload
+        AD_RESPONSE_EMPTY = 215; // Ad metadata not found in response
+        AD_RESPONSE_INVALID_TEMPLATE_TYPE = 216;
+        AD_RESPONSE_TIMED_OUT = 217; // Time out error for /ads request
+        MRAID_JS_DOES_NOT_EXIST = 218; // MRAID JS file not available
+        MRAID_JS_COPY_FAILED = 219; // MRAID JS copy to ad directory failed
+
+        // ad play errors
+
+        reserved 300;
+        MRAID_ERROR = 301; // For logging errors provided from the template
+        INVALID_IFA_STATUS = 302; // The IFA changed values between loading and playing the ad object.
+
+        AD_EXPIRED = 304; // The ad response expired. This is fired immediately when the timer detects that it has expired.
+        MRAID_BRIDGE_ERROR = 305; // Failed to load the index html
+        reserved 306;
+        AD_EXPIRED_ON_PLAY = 307;  // The ad response expired. This is fired when the pub calls play on an expired ad object.
+        AD_WIN_NOTIFICATION_ERROR = 308; // Failed to send the win notification url. Message contains the URL
+        ASSET_FAILED_TO_DELETE = 309; // Logged if asset fails to be removed on cleanup
+        AD_HTML_FAILED_TO_LOAD = 310; // Logged if load fails just before ad play
+        MRAID_JS_CALL_EMPTY = 311; // MRAID JS event does not include expected value
+        DEEPLINK_OPEN_FAILED = 312; // Unable to open deep link URL
+	EVALUATE_JAVASCRIPT_FAILED = 313; // Failed to evaluate javascript
+	LINK_COMMAND_OPEN_FAILED = 314; // Failed to open the mraid link command
+	JSON_PARAMS_ENCODE_ERROR = 315; // Failed to get the json string from json data
+	GENERATE_JSON_DATA_ERROR = 316; // Failed to generate json data from params dictionary
+	AD_CLOSED_TEMPLATE_ERROR = 317; // Template close due to Fatal error reported by template
+	AD_CLOSED_MISSING_HEARTBEAT = 318; // Missing HeartBeat error
+
+        // full screen ads
+
+        CONCURRENT_PLAYBACK_UNSUPPORTED = 400; // Pub attempted to call play on a fullscreen ad object with another already playing
+
+        // banner ads
+
+        BANNER_VIEW_INVALID_SIZE = 500; // Pub provided a different size mount for the banner
+
+        // native ads
+
+        NATIVE_ASSET_ERROR = 600; // missing critical native ad assets
+
+        // iOS Specific errors
+
+        WEB_VIEW_WEB_CONTENT_PROCESS_DID_TERMINATE = 2000;
+        WEB_VIEW_FAILED_NAVIGATION = 2001;
+        STORE_KIT_LOAD_ERROR = 2002;
+        OMSDK_COPY_ERROR = 2003;
+        STORE_OVERLAY_LOAD_ERROR = 2004;
+        REACHABILITY_INITIALIZATION_FAILED = 2005;
+        UNKNOWN_RADIO_ACCESS_TECHNOLOGY = 2006;
+
+        // Android Specific Errors
+
+        OUT_OF_MEMORY = 3001; // Memory Checks
+    }
+}
+
+message MetricBatch {
+    repeated SDKMetric metrics = 1;
+}
+
+message SDKMetric {
+    SDKMetricType type = 1;
+    int64 value = 2;
+    // Misc data like a URL or other information
+    string meta = 3;
+
+    // Device Information
+
+    string make = 4;
+    string model = 5;
+    string os = 6;
+    string osVersion = 7;
+    string connectionType = 8;
+    string connectionTypeDetail = 9;
+
+    // The placement id of the ad, if relevant. There are places where it is unavailable.
+    string placementReferenceId = 10;
+    // The creative id of the ad, if relevant. There are places where it is unavailable.
+    string creativeId = 11;
+
+    enum SDKMetricType {
+        UNKNOWN_METRIC_TYPE = 0;
+        // Time between an ad request sent to and response received from server.
+        AD_REQUEST_TO_RESPONSE_DURATION_MS = 1;
+        // Time between a response received and a call to display the ad.
+        AD_RESPONSE_TO_SHOW_DURATION_MS = 2;
+        // Time between a call to display the ad and the ad becoming visible.
+        AD_SHOW_TO_DISPLAY_DURATION_MS = 3;
+        // Time between an ad becoming visible and a user clicking through.
+        AD_DISPLAY_TO_CLICK_DURATION_MS = 4;
+        // Time between requesting the StoreKit product modal be displayed and it
+        // displaying.
+        IOS_STORE_KIT_LOAD_TIME_MS = 5;
+
+        // Time between init request sent to and response received.
+        INIT_REQUEST_TO_RESPONSE_DURATION_MS = 6;
+        // Time between start of asset download to finish.
+        ASSET_DOWNLOAD_DURATION_MS = 7;
+        // Metric stating that local assets were used for ADO
+        LOCAL_ASSETS_USED = 8;
+        // Metric stating that remote assets were used for ADO
+        REMOTE_ASSETS_USED = 9;
+        // Time to take for downloading only the template.
+        TEMPLATE_DOWNLOAD_DURATION_MS = 10;
+        // Time between the ad request to the publisher callback
+        AD_REQUEST_TO_CALLBACK_DURATION_MS = 11;
+        // Time between the ADO ad request to the publisher callback
+        AD_REQUEST_TO_CALLBACK_ADO_DURATION_MS = 12;
+        // File size of cached asset
+        ASSET_FILE_SIZE = 13;
+        // Time between request and response for user agent used in config
+        USER_AGENT_LOAD_DURATION_MS = 14;
+        // File size of downloaded template zip
+        TEMPLATE_ZIP_SIZE = 15;
+
+        // iOS Specific Metrics
+        // Event - SKOverlay presented to the user
+        SKOVERLAY_PRESENTED_FOR_AD = 2000;
+        // Event - Safari presented to the user
+        SAFARI_PRESENTED_FOR_AD = 2001;
+        // Event - StoreKit product view controller presented to user
+        STORE_KIT_PRESENTED_FOR_AD = 2002;
+    }
+}

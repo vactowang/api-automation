@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-for-qa
+  # namespace: apiqa
+spec:
+  containers:
+  - name: python-for-qa
+    image: havenqivungle/python-alpine-v:0.3
+    imagePullPolicy: Always
+    command:
+    - cat
+    tty: true
+    restartPolicy: Never
+  #   volumeMounts:
+  #           - name: reports-volume
+  #             mountPath: /home/jenkins/agent/workspace/jobs-using-pod-agent/pipeline-demo-slydell/target/allure-results
+  # volumes:
+  #   - name: reports-volume
+  #     persistentVolumeClaim:
+  #       claimName: allure-persistent-volume-claim
+resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 1000m
+      memory: 512Mi

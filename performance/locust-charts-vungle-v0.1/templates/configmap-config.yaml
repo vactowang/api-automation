@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "locust.fullname" . }}-config
+  labels:
+{{ include "locust.labels" . | indent 4 }}
+data:
+  docker-entrypoint.sh: |
+    #!/bin/sh
+
+    set -eu
+
+    # upgrade pip
+    /usr/local/bin/python -m pip install --upgrade pip
+
+    # install packages
+    pip install --user -r /mnt/locust/from-github/packages.txt
+
+    # install specific packages
+    {{- if .Values.loadtest.pip_packages }}
+    pip install --user {{ range .Values.loadtest.pip_packages }}{{ . }} {{ end }}
+    {{- end }}
+
+    # switch to project dir
+    cd /mnt/locust/from-github
+
+    # launch locust
+    exec /usr/local/bin/locust $@

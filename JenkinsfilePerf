@@ -1,0 +1,282 @@
+def get_service() {
+    if (env.JOB_NAME.toLowerCase().contains('_jaeger_')) {
+        return 'jaeger'
+    } else if (env.JOB_NAME.toLowerCase().contains('_bastion_')) {
+        return 'bastion'
+    } else if (env.JOB_NAME.toLowerCase().contains('_hbp_')) {
+        return 'hbp'
+    } else if (env.JOB_NAME.toLowerCase().contains('_scrat_')) {
+        return 'scrat'
+    } else if (env.JOB_NAME.toLowerCase().contains('_bflat_')) {
+        return 'bflat'
+    }
+}
+
+def get_default_host_endpoint(service) {
+    def config = readJSON text: '''{
+        "jaeger": "http://jaeger-qa0-all-instance.apiqa.svc.cluster.local",
+        "bastion": "http://bastion-qa0-instance.apiqa.svc.cluster.local",
+        "hbp": "http://hbp-qa0-apiqa-hbp-instance.apiqa.svc.cluster.local",
+        "scrat": "http://scrat-qa0-all-instance.apiqa.svc.cluster.local",
+        "bflat": "http://bflat-qa0-apiqa-bflat.apiqa.svc.cluster.local"
+    }'''
+    return config[service]
+}
+
+
+def revert_string_to_int(string) {
+    if (string.isInteger()) {
+        string = string.toInteger()
+    } else if (string.isFloat()) {
+        string = string.toFloat().toInteger()
+    } else {
+        return false
+    }
+    return string
+}
+
+def SERVICE = get_service()
+def DEFAULT_HOST = get_default_host_endpoint(SERVICE)
+def LOADTEST_NAME = SERVICE + '-locust'
+def MASTER_POD = ''
+def MASTER_POD_RESTART = ''
+def P95_RESPONSE_TIME = ''
+def RPS = ''
+int USERS = 0
+
+pipeline {
+
+    agent {
+        kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  name: docker-build
+                spec:
+                  securityContext:
+                    runAsUser: 0
+                  containers:
+                  - name: jnlp
+                    image: jenkins/inbound-agent
+                    imagePullPolicy: Always
+                    resources:  # limits the resources your build contaienr
+                      requests:
+                        memory: "500Mi"
+                        cpu: "500m"
+                      limits:
+                        memory: 1Gi
+                    runAsUser: 0
+
+                  - name: docker
+
+                    image: vungle/jenkins-slave:v1.31
+                    #vungle/flam:ci_jenkins_slave_with_docker
+                    command:
+                    - cat
+                    tty: true
+                    env:
+                    - name: DOCKER_HOST
+                      value: tcp://localhost:2375
+                    runAsUser: 0
+                  imagePullSecrets:
+                    - name: vungleregistrykey
+            '''
+            defaultContainer 'docker'
+        }
+    }
+
+
+    environment {   // Local Envs inside of this test pipeline
+        REPORT_DIR = './performance/locust-charts-vungle-v0.1'
+    }
+
+    parameters {  // Inter pipeline Envs, Injected by upstream pipeline, or filled out in manual execution from Jenkins UI
+        string(name: 'TEST_SERVICE_REPLICAS', defaultValue: '1', trim: true, description: 'The number of the tested service pod.')
+        string(name: 'HOST', defaultValue: DEFAULT_HOST, trim: true, description: 'The host URL of the test service.')
+        string(name: 'NAMESPACE', defaultValue: '57blocks', trim: true, description: 'The namespace for the load testing running.')
+        booleanParam(name: 'HEADLESS', defaultValue: true, description: 'Specify the running mode. true is running without the UI; false is running with UI, when running with UI, you should run this command in your terminal:  kubectl --namespace '+env.NAMESPACE+' port-forward service/jaeger-locust 8089:8089, then open in a browser:http://localhost:8089')
+        string(name: 'TARGET_RPS', defaultValue: '100', trim: true, description: 'Specify the target RPS.')
+        string(name: 'RUNTIME', defaultValue: '1h', trim: true, description: 'The time of the benchmark running.')
+        string(name: 'REPLICAS', defaultValue: '4', trim: true, description: 'The number of the test Locust workers.')
+        string(name: 'MAX_P95_RESPONSE_TIME', defaultValue: '100', trim: true, description: 'The acceptable max response time in ms.')
+        string(name: 'SERVICE_GIT_PR', defaultValue: 'NULL', trim: true, description: 'The PR number of the test target.')
+        string(name: 'SERVICE_GIT_COMMIT', defaultValue: 'NULL', trim: true, description: 'The commit hash of the test target.')
+        string(name: 'SERVICE_GIT_TAG', defaultValue: 'NULL', trim: true, description: 'The commit tag of the test target.')
+        string(name: 'Docker_Image_Version', defaultValue: 'NULL', trim: true, description: 'The version of the docker image which was deployed on the test target.')
+        gitParameter(name: 'TEST_BRANCH', type: 'PT_BRANCH', branchFilter: 'origin/(.*)', defaultValue: 'master', description: 'The branch of the testing repo, master by default.')
+    }
+
+    stages {
+
+        stage('Prepare test environment') {
+            steps {
+                sh('''curl -L https://git.io/get_helm.sh | bash -s -- --version v3.8.2''')
+                echo 'Preparing test environment...'
+                echo 'branch is ' + env.GIT_BRANCH.split('/')[1]
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'role_e2e', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                        sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+
+                        def pod_exists = sh(
+                                             script: 'kubectl get pods -n ' + env.NAMESPACE + ' | grep ' + SERVICE + ' | awk \'{print $1}\'',
+                                             returnStdout: true
+                                         ).trim()
+
+                        echo 'pod_exists = ' + pod_exists
+                        if (pod_exists?.trim()) {
+                            sh('helm delete ' + LOADTEST_NAME + ' -n ' + env.NAMESPACE + '')
+                        }
+
+                        int response_time = revert_string_to_int(env.MAX_P95_RESPONSE_TIME)
+                        int rps = revert_string_to_int(env.TARGET_RPS)
+
+                        USERS = rps * (1 + response_time / 1000)
+                        USERS = USERS.intdiv(1)
+                        sh('python3.7 -m pip install --upgrade pip')
+                        sh('pip install ruamel.yaml')
+                        sh('python3.7 update_helm_values.py --service=' + SERVICE + ' --host=' + env.HOST + ' --users=' + USERS + ' --spawnRate=5 --runtime=' + env.RUNTIME + ' --replicas=' + env.REPLICAS + ' --branch=' +env.GIT_BRANCH.split('/')[1] + ' --headless=' +env.HEADLESS)
+                        sh('helm install --namespace ' + env.NAMESPACE + ' ' + LOADTEST_NAME + ' ' + env.REPORT_DIR)
+
+                        while (MASTER_POD == '') {
+                            MASTER_POD = sh(
+                                            script: 'kubectl get pods -n ' + env.NAMESPACE + ' | grep ' + SERVICE + ' | grep Running | grep master | awk \'{print $1}\'',
+                                            returnStdout: true
+                                         ).trim()
+                        }
+                        echo 'MASTER_POD = ' + MASTER_POD
+                    }
+                }
+            }
+        }
+
+        stage('Execute performance test') {
+            steps {
+                echo 'Executing performance test...'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'role_e2e', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                        sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+                        sh('kubectl logs -f ' + MASTER_POD + ' -n ' + env.NAMESPACE)
+                        sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+
+                        while (MASTER_POD_RESTART != MASTER_POD) {
+                            while (MASTER_POD_RESTART == '') {
+                                MASTER_POD_RESTART = sh(
+                                                     script: 'kubectl get pods -n ' + env.NAMESPACE + ' | grep '+ SERVICE +' | grep Running | grep master | awk \'{print $1}\'',
+                                                     returnStdout: true
+                                                  ).trim()
+                            }
+                            if (MASTER_POD_RESTART == MASTER_POD ) {
+                                break
+                            }
+                            MASTER_POD = MASTER_POD_RESTART
+                            MASTER_POD_RESTART = ''
+                            sh('kubectl logs -f ' + MASTER_POD + ' -n ' + env.NAMESPACE)
+                            sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+                        }
+                        sh('kubectl cp -n ' + env.NAMESPACE + ' ' + MASTER_POD + ':/mnt/locust/result.html ' + REPORT_DIR + '/result.html')
+                        sh('kubectl cp -n ' + env.NAMESPACE + ' ' + MASTER_POD + ':/mnt/locust/result_stats.csv ' + REPORT_DIR + '/result_stats.csv')
+
+                        P95_RESPONSE_TIME = sh(
+                                               script: 'awk -F \",\" \'NR==3{print $17}\' ' + REPORT_DIR + '/result_stats.csv',
+                                               returnStdout: true
+                                            ).trim()
+                        RPS = sh(
+                                 script: 'awk -F \",\" \'NR==3{print $10}\' ' + REPORT_DIR + '/result_stats.csv',
+                                 returnStdout: true
+                              ).trim()
+                    }
+                }
+            }
+        }
+
+        stage('Generate report') {
+            steps {
+                echo 'Generating report...'
+                script {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: REPORT_DIR,
+                        reportFiles: 'result.html',
+                        reportName: 'Performance Report',
+                        reportTitles: ''])
+
+                    echo "Test Report: " + REPORT_DIR + "/result.html"
+                    echo 'Actual p95 response time: ' + P95_RESPONSE_TIME + 'ms in the RPS of ' + RPS
+                    echo 'Acceptable max p95 response time: ' + env.MAX_P95_RESPONSE_TIME + 'ms'
+
+                    if (P95_RESPONSE_TIME.toInteger() <= env.MAX_P95_RESPONSE_TIME.toInteger()) {
+                        echo 'The actual p95 response time ' + P95_RESPONSE_TIME + 'ms is not greater than the acceptable p95 max response time ' + env.MAX_P95_RESPONSE_TIME + 'ms.'
+                    } else {
+                        echo 'The actual p95 response time ' + P95_RESPONSE_TIME + 'ms is greater than the acceptable p95 max response time ' + env.MAX_P95_RESPONSE_TIME + 'ms. \nTest Failed!'
+                        currentBuild.result = 'UNSTABLE'
+                    }
+               }
+            }
+        }
+
+
+         stage('Clear test environment') {
+            steps {
+                echo 'Clear test environment...'
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'role_e2e', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                        sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+                        sh('helm delete  ' + LOADTEST_NAME + ' -n '+ env.NAMESPACE)
+                    }
+               }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            script {
+                slackSend (
+                    channel: '#jaeger-feed',
+                    teamDomain: 'vungle',
+                    tokenCredentialId: 'platform_ci_test_slack_token',
+                    color: '#00FF00',
+                    message: "*Test Job:* ${env.JOB_NAME}\n*Build Num:* ${env.BUILD_NUMBER}\n*Test Service Host:* ${env.HOST}\n*Locust Worker Number:* ${env.REPLICAS}\n*Test User Number:* ${USERS}\n*User Spawn Rate:* ${env.SPAWN_RATE}\n*Benchmark Running Time:* ${env.RUNTIME}\n*Test Result:* :green_light:Passed\n*Test Duration:* ${currentBuild.durationString}\n*Test Report:* ${env.BUILD_URL}Performance_20Report/\n*Docker Image Version:* ${env.Docker_Image_Version}\n*Service Version:* ${env.SERVICE_GIT_PR}-${env.SERVICE_GIT_COMMIT}-${env.SERVICE_GIT_TAG}\n*Test Script Version:* ${env.GIT_BRANCH}-${env.GIT_COMMIT}, and the actual 95p response time is ${P95_RESPONSE_TIME}ms."
+                )
+            }
+        }
+        unstable {
+            script {
+                slackSend (
+                    channel: '#jaeger-feed',
+                    teamDomain: 'vungle',
+                    tokenCredentialId: 'platform_ci_test_slack_token',
+                    color: '#F8DE00',
+                    message: "*Test Job:* ${env.JOB_NAME}\n*Build Num:* ${env.BUILD_NUMBER}\n*Test Service Host:* ${env.HOST}\n*Locust Worker Number:* ${env.REPLICAS}\n*Test User Number:* ${USERS}\n*User Spawn Rate:* ${env.SPAWN_RATE}\n*Benchmark Running Time:* ${env.RUNTIME}\n*Test Result:* :red_light:Failed\n*Test Duration:* ${currentBuild.durationString}\n*Test Report:* ${env.BUILD_URL}Performance_20Report/\n*Docker Image Version:* ${env.Docker_Image_Version}\n*Service Version:* ${env.SERVICE_GIT_PR}-${env.SERVICE_GIT_COMMIT}-${env.SERVICE_GIT_TAG}\n*Test Script Version:* ${env.GIT_BRANCH}-${env.GIT_COMMIT}"
+
+                )
+            }
+        }
+        failure {
+            script {
+                slackSend (
+                    channel: '#jaeger-feed',
+                    teamDomain: 'vungle',
+                    tokenCredentialId: 'platform_ci_test_slack_token',
+                    color: '#FF0000',
+                    message: "The job ${env.JOB_NAME} is broken, Please check the reason. (${env.BUILD_URL}), or the actual 95p response time ${P95_RESPONSE_TIME}ms is greater than the acceptable response time ${env.MAX_P95_RESPONSE_TIME}ms."
+                )
+            }
+        }
+        aborted {
+            script {
+                    withCredentials([usernamePassword(credentialsId: 'role_e2e', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                        sh('aws --region us-west-2 eks update-kubeconfig --name EKS-QA')
+                        sh('helm delete  ' + LOADTEST_NAME + ' -n '+ env.NAMESPACE)
+                    }
+            }
+        }
+    }
+
+}
+
+

@@ -1,0 +1,27 @@
+{
+    "vungle_mraid":{
+        "Kraken":{
+            "fullscreen":"2:MXw2YWIwNjBmNzQwZGU2MjZlYmM0OTZlN2VjYjE0ZjA3NDk5MmYwOTlmfGMzMGEyYmJ0ZHQzcTlmbXQwbWwwOjEx",
+            "banner":"2:MXwwY2NmZTA1YjMyNzM5MGY2MmYwMDU3MTRjNTNkYWIzN2Q1ODNhNmRkfGMzMGEyYnJ0ZHQzcTlmbXQwbW0wOjEx",
+            "image_mrec":"2:MXxmODllMzJlNjIzODc1MDg4M2I4ZDlhZmM1NjRiMjE1YzQ1N2YwMjI1fGMzMGEyYzN0ZHQzcTlmbXQwbW4wOjEx",
+            "video_mrec":"2:MXw2NWQ5MWM4OWJjYTIxYTAyMGM4MjVmMjQ2MDI4ODA1ZDY0OGI2YTAxfGMzMGEyY2J0ZHQzcTlmbXQwbW8wOjEx"
+        },
+        "meister":{
+            "fullscreen":"2:MXw2YWIwNjBmNzQwZGU2MjZlYmM0OTZlN2VjYjE0ZjA3NDk5MmYwOTlmfGMzMGEyY2p0ZHQzcTlmbXQwbXAwOjEx",
+            "banner":"2:MXwwY2NmZTA1YjMyNzM5MGY2MmYwMDU3MTRjNTNkYWIzN2Q1ODNhNmRkfGMzMGEyY3J0ZHQzcTlmbXQwbXEwOjEx",
+            "video_mrec":"2:MXw2NWQ5MWM4OWJjYTIxYTAyMGM4MjVmMjQ2MDI4ODA1ZDY0OGI2YTAxfGMzMGEyZDN0ZHQzcTlmbXQwbXIwOjEx",
+            "image_mrec":"2:MXxmODllMzJlNjIzODc1MDg4M2I4ZDlhZmM1NjRiMjE1YzQ1N2YwMjI1fGMzMGEyZGJ0ZHQzcTlmbXQwbXMwOjEx"
+        }
+    },
+    "programmatic_vast":{
+        "Kraken":{
+            "video":"2:MXw2YWIwNjBmNzQwZGU2MjZlYmM0OTZlN2VjYjE0ZjA3NDk5MmYwOTlmfGMzMGEyZGp0ZHQzcTlmbXQwbXQwOjEx"
+        }
+    },
+    "programmatic_mraid":{
+        "Kraken":{
+            "banner":"2:MXwwY2NmZTA1YjMyNzM5MGY2MmYwMDU3MTRjNTNkYWIzN2Q1ODNhNmRkfGMzMGEyZHJ0ZHQzcTlmbXQwbXUwOjEx",
+            "mrec":"2:Mnx4dno3YVE9PXxjMzBhMmUzdGR0M3E5Zm10MG11ZzoxMQ=="
+        }
+    }
+}

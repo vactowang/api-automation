@@ -1,0 +1,5 @@
+﻿"priority","platform","placement_type","mediation_partner","country","edsp_margin"
+"1","android","interstitial","max","","0.25"
+"2","android","rewarded","max","","0.25"
+"3","android","banner","max","","0.25"
+"4","android","mrec","max","","0.25"

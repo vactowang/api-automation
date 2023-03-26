@@ -1,0 +1,428 @@
+import pytest
+import allure
+
+from http import HTTPStatus
+
+from data import request_payload
+from utils.common import *
+from utils.assertions import *
+from settings import *
+from data import response_schema
+
+
+@allure.epic('bastion v5')
+class TestMultiCacheAds(object):
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify the max hb cache value, hb is ture and max_hb_cache sets')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', [common_test_placement])
+    def test_multi_cache_1(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 2
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(2))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify the max hb cache value, hb is false and max_hb_cache sets')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['HJKM6GM50919'])
+    def test_multi_cache_2(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": false,
+            "max_hb_cache": 4
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0', 'v0.106.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config,'
+                  'PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value is 1 if hb is true and max_hb_cache does not set')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['INTER-MREC-001'])
+    def test_multi_cache_3(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(1))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify the max hb cache value, hb is false and max_hb_cache does not set')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['AREYOUS82690'])
+    def test_multi_cache_4(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": false
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0', 'v0.106.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config,'
+                  'PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value is 1 if hb is ture and max_hb_cache is 0')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['INTER-MREC-002'])
+    def test_multi_cache_5(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 0
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(1))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0', 'v0.106.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config,'
+                  'PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value is 1 if hb is ture and max_hb_cache is null')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['INTER-MREC-003'])
+    def test_multi_cache_6(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": null
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(1))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify the max hb cache value, hb is ture and max_hb_cache sets, android')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [android_common_test_app])
+    @pytest.mark.parametrize('placement', [android_common_test_placement])
+    def test_multi_cache_android(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 2
+        '''
+        req = request_payload.config_v5_android(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(2))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'test_mode', 'v0.98.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify the max hb cache value, hb is ture and max_hb_cache sets, windows')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [windows_common_test_app])
+    @pytest.mark.parametrize('placement', [windows_common_test_placement])
+    def test_multi_cache_windows(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 2
+        '''
+        req = request_payload.config_v5_windows(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(2))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'v0.104.0')
+    @allure.story('PBJ-3068 Bastion should return realtime settings in bastion response')
+    @allure.description('Verify the max hb cache value should follow the value of max_hb_cache')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', [common_test_placement])
+    def test_hb_cache_type(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 2,
+            "hb_cache_type": "multi_cache",
+            "max_hb_rt_cache": 3,
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(2))
+
+    @allure.feature('multi cache ads')
+    @allure.tag('normal', 'v0.98.0', 'v0.104.0')
+    @allure.story('PBJ-2371 Add max_hb_cache field to placement config')
+    @allure.description('Verify that Bastion will handle the max value of max_hb_cache as 4')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['MULTI-CACHE-FULLSCREEN-1'])
+    def test_multi_cache_51(self, pub_app_id, placement):
+        '''
+        Placement level setting:
+            "is_hb_participation": true,
+            "max_hb_cache": 5,
+            "hb_cache_type": "multi_cache"
+        '''
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req,
+                 headers=platform_headers(sdk_version=test_default_multi_cache_sdk_version))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_that(placement_obj['max_hb_cache'], equal_to(4))
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version >= 6.10.1')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-2109348',
+                                           'IN_APP_BIDDING_DISABLED_MREC-8321623',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-4616351'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.10.1', 'Vungle/6.10.2'])
+    def test_multi_cache_in_app_disabled_1(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version < 6.10.1')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-2109348',
+                                           'IN_APP_BIDDING_DISABLED_MREC-8321623',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-4616351'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.10.0'])
+    def test_multi_cache_in_app_disabled_2(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version <= 6.9.2')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-2109348',
+                                           'IN_APP_BIDDING_DISABLED_MREC-8321623',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-4616351'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.9.2', 'Vungle/6.9.1'])
+    def test_multi_cache_in_app_disabled_3(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_ios(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version >= 6.10.1')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [android_common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-8446105',
+                                           'IN_APP_BIDDING_DISABLED_MREC-2612604',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-9471286'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.10.1', 'Vungle/6.10.2'])
+    def test_multi_cache_in_app_disabled_4(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_android(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version < 6.10.1')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [android_common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-8446105',
+                                           'IN_APP_BIDDING_DISABLED_MREC-2612604',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-9471286'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.10.0'])
+    def test_multi_cache_in_app_disabled_5(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_android(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')
+
+    @allure.feature('real-time ad')
+    @allure.tag('normal', 'v0.106.0')
+    @allure.story('PBJ-3132 Cover corner cases for real-time ads and multi-token')
+    @allure.description('Verify the max hb cache value will not apply for the in-app bidding disabled app'
+                        'via SDK version <= 6.9.2')
+    @allure.severity('normal')
+    @pytest.mark.parametrize('pub_app_id', [android_common_test_app])
+    @pytest.mark.parametrize('placement', ['IN_APP_BIDDING_DISABLED_VIDEO-8446105',
+                                           'IN_APP_BIDDING_DISABLED_MREC-2612604',
+                                           'IN_APP_BIDDING_DISABLED_BANNER-9471286'])
+    @pytest.mark.parametrize('sdk_v', ['Vungle/6.9.2', 'Vungle/6.9.1'])
+    def test_multi_cache_in_app_disabled_6(self, pub_app_id, placement, sdk_v):
+        req = request_payload.config_v5_android(pub_app_id)
+        r = post(config_v5_endpoint_qa, json=req, headers=platform_headers(sdk_version=sdk_v))
+
+        response_payload = r.json()
+        assert_response_status_code(r.status_code, HTTPStatus.OK)
+        assert_valid_schema(response_payload, response_schema.config_v5)
+
+        placements = response_payload['placements']
+        for placement_obj in placements:
+            if placement_obj['reference_id'] == placement:
+                assert_keys_not_exist(placement_obj, 'max_hb_cache')
+                assert_keys_not_exist(placement_obj, 'header_bidding')

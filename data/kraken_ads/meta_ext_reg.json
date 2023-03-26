@@ -1,0 +1,73 @@
+[
+   {
+      "ad_type":"video",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_ios.json",
+      "ad_market_id": "1490962424"
+   },
+   {
+      "ad_type":"video",
+      "os":"android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_android.json"
+   },
+   {
+      "ad_type":"video",
+      "os":"windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_windows.json",
+      "ad_market_id": "1490962424"
+   },
+   {
+      "ad_type":"banner",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   },
+   {
+      "ad_type":"banner",
+      "os":"android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   },
+   {
+      "ad_type":"banner",
+      "os":"windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   },
+   {
+      "ad_type":"native",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_native_ios.json",
+      "ad_market_id": "880047117"
+   },
+   {
+      "ad_type":"native",
+      "os":"android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_native_android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_type":"native",
+      "os":"windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_native_windows.json",
+      "ad_market_id": "524299475"
+   },
+   {
+      "ad_type":"playable",
+      "os":"ios",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   },
+   {
+      "ad_type":"playable",
+      "os":"android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   },
+   {
+      "ad_type":"playable",
+      "os":"windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_banner.json",
+      "ad_market_id": "com.azarlive.android"
+   }
+]

@@ -1,0 +1,38 @@
+
+pipeline {
+
+    agent {
+        kubernetes {
+            label 'Feature_CI_Env'
+            yamlFile 'KubernetesPod.yaml'
+            defaultContainer 'pytest-ssp-feature'
+        }
+    }
+
+
+    parameters {  // Inter pipeline Envs, Injected by upstream pipeline, or filled out in manual execution from Jenkins UI
+        gitParameter(name: 'TEST_BRANCH', type: 'PT_BRANCH', branchFilter: 'origin/(.*)', defaultValue: 'master', description: 'The branch of the testing repo, master by default.')
+
+    }
+
+
+    stages {
+        stage('Prepare test environment') {
+            steps {
+                echo 'Preparing test environment...'
+                script {
+                        withCredentials([usernamePassword(credentialsId: 'role_e2e', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                                sh('py.test -k test_jaeger_prepare_test_ads')
+                                sh('sleep 1m')
+                        }
+
+
+            }
+        }
+
+
+
+    }
+
+}
+}

@@ -1,0 +1,144 @@
+{
+    "endpoints": {
+        "ads": {
+            "qa": "http://jaeger-reg-all.ads-qa.vungle.com",
+            "regression": "http://jaeger-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "http://internal-ab748eebc0c944c79ab476fb2414c52b-1038151615.us-west-2.elb.amazonaws.com:7000",
+            "perf": "http://internal-a06907b3a41964bc881660966bed9cec-249035833.us-west-2.elb.amazonaws.com:7000"
+        },
+        "config": {
+            "qa": "http://bastion-reg.ads-qa.vungle.com",
+            "regression": "http://bastion-reg-instance.apiqa.svc.cluster.local",
+            "ci": "https://apiqa.vungle.com"
+        },
+        "hbp": {
+            "qa": "http://hbp-reg.ads-qa.vungle.com",
+            "regression": "http://hbp-reg-instance.apiqa.svc.cluster.local",
+            "ci": "http://internal-aa77d439fc8eb43cf9432345e29937bd-1467361235.us-west-2.elb.amazonaws.com",
+            "perf": "http://internal-a7ca9b0fb7a624593b5a1a3b32c29b97-282226252.us-west-2.elb.amazonaws.com"
+        },
+        "hbp_ssl": {
+            "qa": "https://hbp-reg.ads-qa.vungle.com",
+            "regression": "https://hbp-reg.ads-qa.vungle.com",
+            "ci": "https://a6c6d3cd847ab47ad8ea00fdcc5e63e7-1fb9fad636cb8389.elb.us-west-2.amazonaws.com"
+        },
+        "scrat_notification": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "https://events-ext-qa.api.vungle.com"
+        },
+        "scrat_notification_ssl": {
+            "qa": "https://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "https://scrat-reg-all.ads-qa.vungle.com",
+            "ci": "https://events-ext-qa.api.vungle.com"
+        },
+        "scrat_all": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "http://internal-a9e9a5408cd5a4c4baec60fc8bf0d7ee-2028572035.us-west-2.elb.amazonaws.com:7000"
+        },
+        "cache_bust": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "https://events-ext-qa.api.vungle.com"
+        },
+        "sdk_bi": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "http://internal-a9e9a5408cd5a4c4baec60fc8bf0d7ee-2028572035.us-west-2.elb.amazonaws.com:7000"
+        },
+        "tpat": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "http://internal-a9e9a5408cd5a4c4baec60fc8bf0d7ee-2028572035.us-west-2.elb.amazonaws.com:7000"
+        },
+        "bflat": {
+            "qa": "http://bflat-reg.ads-qa.vungle.com",
+            "regression": "http://bflat-reg.apiqa.svc.cluster.local:3000",
+            "ci": "http://internal-ad0fa07462f8044c6a4051ef8adc0a1d-231075559.us-west-2.elb.amazonaws.com:3000",
+            "perf": "http://internal-a7fc004e828e941b283665835c1d860b-500326070.us-west-2.elb.amazonaws.com:3000"
+        },
+        "impression": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "https://events-ext-qa.api.vungle.com"
+        },
+        "hbp_notification": {
+            "qa": "http://hbp-reg.ads-qa.vungle.com",
+            "regression": "http://hbp-reg-instance.apiqa.svc.cluster.local",
+            "ci": "https://rtb-ext-qa.api.vungle.com"
+        },
+        "load_ad": {
+            "qa": "http://scrat-reg-all.ads-qa.vungle.com",
+            "regression": "http://scrat-reg-all-instance.apiqa.svc.cluster.local",
+            "ci": "https://events-ext-qa.api.vungle.com"
+        }
+    },
+    "env": "qa",
+    "perfEnv": "perf",
+    "skip_int": "no",
+    "bflat": {
+        "edsp_exp_list": {
+            "banner": [0],
+            "video": [0, 2, 6, 7]
+        },
+        "idsp_exp_list": {
+            "banner": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "video": [7, 8, 10, 12, 13]
+        },
+        "random_exp_list": [
+               9,
+             132,
+             137,
+             139,
+             140
+        ]
+    },
+    "hb_partners": [
+        "adtiming",
+        "aequus",
+        "charboost",
+        "fyber",
+        "ironsource",
+        "max",
+        "ohayoo",
+        "saygames",
+        "topon",
+        "unity",
+        "wildlife",
+        "appodeal",
+        "fb_test",
+        "admob"
+    ],
+    "realtime_hb_partners": [
+        "adtiming",
+        "aequus",
+        "charboost",
+        "fyber",
+        "ironsource",
+        "max",
+        "ohayoo",
+        "saygames",
+        "topon",
+        "unity",
+        "wildlife",
+        "appodeal",
+        "fb_test"
+    ],
+    "burl_hb_partners": [
+        "max",
+        "topon",
+        "admob"
+    ],
+    "s2s_partners": [
+        "sigmob",
+        "standard"
+    ]
+}

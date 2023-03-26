@@ -1,0 +1,92 @@
+loadtest:
+  # loadtest.name -- a name used for resources and settings in this load test
+  name: jaeger-locust
+  locust_locustfile: jaeger_service.py
+  locust_host: http://internal-a06907b3a41964bc881660966bed9cec-249035833.us-west-2.elb.amazonaws.com:7000
+  pip_packages: []
+  environment: {}
+  environment_secret: {}
+  environment_external_secret: {github-repo-cred: repo-token}
+  branch: perf-log-single-rtb-rps
+  headless: true
+  users: 100
+  spawn_rate: 5
+  run_time: 30m
+  html: result.html
+  csv: result
+  list: true
+  tags: ''
+  excludeTags: ''
+image:
+  repository: locustio/locust
+  tag: 1.4.4
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  annotations: {}
+  extraLabels: {}
+master:
+  # master.image -- A custom docker image including tag
+  image: ''
+  logLevel: INFO
+  resources:
+    limits:
+      cpu: 2
+      memory: 512Mi
+    requests:
+      cpu: 2
+      memory: 512Mi
+  serviceAccountAnnotations: {}
+  environment: {}
+  args_include_default: true
+  args: []
+  command:
+    - sh
+    - /config/docker-entrypoint.sh
+  strategy:
+    type: RollingUpdate
+  pdb:
+    enabled: false
+worker:
+  # worker.image -- A custom docker image including tag
+  image: ''
+  logLevel: INFO
+  replicas: 3
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 40
+  resources:
+    limits:
+      cpu: 2
+      memory: 2048Mi
+    requests:
+      cpu: 2
+      memory: 2048Mi
+  serviceAccountAnnotations: {}
+  environment: {}
+  args_include_default: true
+  args: []
+  command:
+    - sh
+    - /config/docker-entrypoint.sh
+  strategy:
+    type: RollingUpdate
+nameOverride: ''
+fullnameOverride: ''
+imagePullSecrets: [vungleregistrykey]
+podSecurityContext: {}
+securityContext:
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      path: /
+  tls: []
+extraConfigMaps: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+extraLabels: {}

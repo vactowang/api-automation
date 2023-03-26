@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "locust.fullname" . }}-worker
+  labels:
+    component: worker
+{{ include "locust.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      component: worker
+      {{- include "locust.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.worker.replicas }}
+{{- with .Values.worker.strategy }}
+  strategy:
+{{ toYaml . | trim | indent 4 }}
+{{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/config-config: {{ include (print $.Template.BasePath "/configmap-config.yaml") . | sha256sum }}
+        checksum/config-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        component: worker
+        {{- include "locust.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ template "locust.fullname" . }}-worker
+      initContainers:
+      # This container clones the desired git repo to the EmptyDir volume.
+      - image: us.gcr.io/k8s-artifacts-prod/git-sync/git-sync:v3.3.2
+        name: git-sync-sidecar
+        args:
+          - "-repo=https://github.com/Vungle/qa-platform-api.git"
+          - "-branch={{ .Values.loadtest.branch }}"
+          - "-depth=1"
+          - "-max-sync-failures=6"
+          - "-wait=10" # max-sync-failures=6 * wait=10 = 60 seconds maximum runtime for the init container
+          - "-one-time=true" # exit after the first sync (we just want to initialize the file system)
+          - "-root=/repo"
+          - "-dest=from-github"
+          - "-username=emily-57blocks"
+          - "-password=$(repo-token)"
+#          - "-ssh=true"
+        volumeMounts:
+          - name: git-repo
+            mountPath: /repo
+            readOnly: false
+        securityContext:
+          runAsUser: 65533 # git-sync-user
+        env:
+{{- range $key, $value := .Values.loadtest.environment_external_secret }}
+          - name: {{ $value }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ $key }}
+                key: {{ $value }}
+{{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ if .Values.worker.image }}{{ .Values.worker.image }}{{ else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{ end }}"
+{{- with .Values.worker.command }}
+        command:
+        {{- toYaml . | nindent 8 }}
+{{- end }}
+{{- if .Values.worker.args }}
+        args:
+        {{- toYaml .Values.worker.args | nindent 8 }}
+{{ else if .Values.worker.args_include_default }}
+        args:
+          - --worker
+          - --locustfile=/mnt/locust/from-github/performance/testcases/{{ .Values.loadtest.locust_locustfile }}
+          - --host={{ .Values.loadtest.locust_host }}
+          - --master-host={{ template "locust.fullname" . }}
+          - --loglevel={{ .Values.worker.logLevel }}
+{{- if .Values.loadtest.tags }}
+          - --tags {{ .Values.loadtest.tags }}
+{{- end }}
+{{- if .Values.loadtest.excludeTags }}
+          - --exclude-tags {{ .Values.loadtest.excludeTags }}
+{{- end }}
+{{- end }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+{{ toYaml .Values.worker.resources | indent 10 }}
+        volumeMounts:
+          - name: git-repo
+            mountPath: /mnt/locust
+          - name: config
+            mountPath: /config
+{{- if .Values.extraConfigMaps }}
+{{- range $key, $value := .Values.extraConfigMaps }}
+          - name: {{ $key }}
+            mountPath: {{ $value }}
+{{- end }}
+{{- end}}
+        env:
+          - name: LOCUST_HOST
+            value: "{{ .Values.loadtest.locust_host }}"
+          - name: LOCUST_MASTER_HOST
+            value: "{{ template "locust.fullname" . }}"
+          - name: LOCUST_MASTER_PORT
+            value: "5557"
+{{- range $key, $value := .Values.worker.environment }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+{{- end }}
+{{- range $key, $value := .Values.loadtest.environment }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+{{- end }}
+{{- range $key, $value := .Values.loadtest.environment_secret }}
+          - name: {{ $key }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "locust.fullname" $ }}
+                key: {{ $key }}
+{{- end }}
+{{- range $key, $value := .Values.loadtest.environment_external_secret }}
+          - name: {{ $value }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ $key }}
+                key: {{ $value }}
+{{- end }}
+      imagePullSecrets:
+        - name: vungleregistrykey
+      restartPolicy: Always
+      volumes:
+        - name: git-repo
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ template "locust.fullname" . }}-config
+{{- if .Values.extraConfigMaps }}
+{{- range $key, $value := .Values.extraConfigMaps }}
+        - name: {{ $key }}
+          configMap:
+            name: {{ $key }}
+{{- end }}
+{{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,419 @@
+[
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Multi_page_full_screen_MRAID_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Multi_page_full_screen_MRAID_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Multi_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Multi_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Single_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Single_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Single_page_full_screen_MRAID_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Single_page_full_screen_MRAID_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "ad_size":{
+         "width":900,
+         "height":1200
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/vungle_mraid_windows.json",
+      "ad_market_id": "9MT23KFCDF5W"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "ad_size":{
+         "width":900,
+         "height":1200
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/vungle_mraid_windows.json",
+      "ad_market_id": "9MT23KFCDF5W"
+   },
+   {
+      "ad_format":"single_page_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/MREC_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"single_page_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/MREC_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":728,
+         "height":90
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_728x90_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":728,
+         "height":90
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_728x90_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "ad_size":{
+         "width":728,
+         "height":90
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_728x90_for_Windows.json",
+      "ad_market_id": "9MT23KFCDF5W"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":320,
+         "height":50
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_320x50_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":320,
+         "height":50
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_320x50_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":300,
+         "height":50
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_300x50_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"banner",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":300,
+         "height":50
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Banner_size_300x50_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"single_page_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/MREC_for_Windows.json",
+      "ad_market_id": "9MT23KFCDF5W"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"amazon",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Multi_page_full_screen_MRAID_for_Amazon.json",
+      "ad_market_id": "B00PSID6ZK"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"amazon",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Multi_page_full_screen_MRAID_for_Amazon.json",
+      "ad_market_id": "B00PSID6ZK"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"amazon",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Single_page_full_screen_MRAID_for_Amazon.json",
+      "ad_market_id": "B00PSID6ZK"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"amazon",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Single_page_full_screen_MRAID_for_Amazon.json",
+      "ad_market_id": "B00PSID6ZK"
+   },
+   {
+      "ad_format":"image_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Image_MREC_for_Windows.json",
+      "ad_market_id": "9nblggh6bng3"
+   },
+   {
+      "ad_format":"image_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Image_MREC_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"image_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Image_MREC_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"image_mrec",
+      "ad_type":"vungle_mraid",
+      "os":"amazon",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Image_MREC_for_Amazon.json",
+      "ad_market_id": "B00PSID6ZK"
+   },
+   {
+      "ad_format":"native",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/int_native_ios.json",
+      "ad_market_id": "880047117"
+   },
+   {
+      "ad_format":"native",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/int_native_android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"native",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/int_native_windows.json",
+      "ad_market_id": "5234415473580248409"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_local",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/vungle_legacy_ios.json",
+      "ad_market_id": "604044220"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_local",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/vungle_legacy_ios.json",
+      "ad_market_id": "604044220"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"playable",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Single_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"Rewarded_page_fullscreen",
+      "ad_type":"playable",
+      "os":"Android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Single_page_full_screen_MRAID_for_Android.json",
+      "ad_market_id": "com.vungle.games.tossacoin"
+   },
+   {
+      "ad_format":"Rewarded_page_fullscreen",
+      "ad_type":"playable",
+      "os":"Windows",
+      "ad_size":{
+         "width":900,
+         "height":1200
+      },
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/vungle_mraid_windows.json",
+      "ad_market_id": "9MT23KFCDF5W"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/Rewarded_Single_page_full_screen_MRAID_for_iOS.json",
+      "ad_market_id": "1046740065"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_ios.json",
+      "ad_market_id": "1490962424"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_android.json"
+   },
+   {
+      "ad_format":"multi_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "ad_size":{
+         "width":900,
+         "height":1200
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_windows.json",
+      "ad_market_id": "1490962424"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"iOS",
+      "ad_size":{
+         "width":828,
+         "height":1792
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_ios.json",
+      "ad_market_id": "1490962424"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Android",
+      "ad_size":{
+         "width":1080,
+         "height":1920
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_android.json"
+   },
+   {
+      "ad_format":"single_page_fullscreen",
+      "ad_type":"vungle_mraid",
+      "os":"Windows",
+      "ad_size":{
+         "width":900,
+         "height":1200
+      },
+      "s2s": true,
+      "url":"https://vungle2-cdn-qa.s3.amazonaws.com/test-model/ext_vast_windows.json",
+      "ad_market_id": "1490962424"
+   }
+]

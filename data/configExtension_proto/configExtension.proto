@@ -1,0 +1,41 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+message ConfigExtension {
+  Experiments experiments = 1;
+  string      ipaddress   = 2;
+  repeated string ad_network_ids = 3;
+  google.protobuf.BoolValue lmt = 4;
+  Device device = 5;
+  google.protobuf.BoolValue disable_ad_id = 6;
+}
+message Experiments {
+  // This is the experiments already run in config, only need to record in jaeger.
+  map<string, string> cfg_exps = 1; // Deprecated, do not use this.
+  // This is the experiments already run in config, need action in jaeger.
+  repeated Experiment exps = 2;
+  // If in future there is more other fields add to here.
+}
+message Experiment {
+  string name = 1;
+  string bucket_name = 2;
+  EXPERIMENT_STRATEGY strategy = 3;
+}
+enum EXPERIMENT_STRATEGY {
+  RECORD = 0;
+  APPLY = 1;
+  NOT_IN_TRAFFIC=2;
+}
+message Device {
+  string os=1;
+  string osv=2;
+  string make =3;
+  string model=4;
+  string browser_user_agent=5;
+  int64 width=6;
+  int64 height=7;
+  google.protobuf.StringValue carrier=11;
+  google.protobuf.StringValue connection_type =12;
+  google.protobuf.StringValue connection_type_detail =13;
+  google.protobuf.DoubleValue battery_level=14;
+  google.protobuf.Int64Value storage_bytes_available=15;
+}
